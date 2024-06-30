@@ -58,8 +58,14 @@ class _SourceState extends State<Source> {
               child: TextButton(
                 child: Text('pass'),
                 onPressed: () {
-                  Navigator.pushNamed(context, destination,
-                      arguments: {_itemCount, product});
+                  Navigator.pushNamed(
+                    context,
+                    destination,
+                      arguments: {
+                        'itemCount' : _itemCount,
+                         'product' : product,
+                        }
+                    );
                 },
               ),
             );
