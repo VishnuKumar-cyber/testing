@@ -10,8 +10,9 @@ class Routes {
       case source:
         return MaterialPageRoute(builder: (context) => const Source());
       case destination:
-        final count = settings.arguments['itemCount'] as int;
-        final product = settings.arguments['product'] as Product;
+        final args = settings.arguments as Map<String, dynamic>;
+        final count = args['itemCount'] as int;
+        final product = args['product'] as Product;
         return MaterialPageRoute(
             builder: (context) => Destination(
                   itemCount: count,

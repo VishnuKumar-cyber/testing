@@ -35,6 +35,11 @@ class _SourceState extends State<Source> {
     return data;
   }
 
+  void initState() {
+    super.initState();
+    future = fetchData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,8 +63,10 @@ class _SourceState extends State<Source> {
               child: TextButton(
                 child: Text('pass'),
                 onPressed: () {
-                  Navigator.pushNamed(context, destination,
-                      arguments: {_itemCount, product});
+                  Navigator.pushNamed(context, destination, arguments: {
+                    'itemCount': _itemCount,
+                    'product': product,
+                  });
                 },
               ),
             );
