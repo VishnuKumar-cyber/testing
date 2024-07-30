@@ -1,0 +1,691 @@
+import 'package:buildup/src/Utils/Colors.dart';
+import 'package:buildup/src/Utils/Common.dart';
+import 'package:flutter/Material.dart';
+import 'package:flutter/services.dart';
+
+import '../../../../Utils/String.dart';
+
+class Product extends StatefulWidget {
+  const Product({super.key});
+
+  @override
+  State<Product> createState() => _ProductState();
+}
+
+class _ProductState extends State<Product> {
+  late String _selectedImage;
+  final Map<int, int?> _selectedIndices = {};
+  TextEditingController quantity = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedImage = samples[0];
+    for (int i = 0; i < sampleattributes.length; i++) {
+      _selectedIndices[i] =
+          0; // Initialize each section with the first item selected
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    quantity.text = "1000";
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            imageSection(),
+            DetailSection(),
+          ],
+        ),
+        Container(
+          height: 100,
+          color: Colors.red,
+        )
+      ],
+    );
+  }
+
+  Widget imageSection() {
+    return Expanded(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Flexible(
+                fit: FlexFit.loose,
+                child: Column(
+                  children: [
+                    Container(
+                      height: MediaQuery.of(context).size.height * 1.2,
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: samples.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedImage = samples[index];
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Container(
+                                height: 100,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: black,
+                                    )),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    samples[index],
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10.0),
+                      height: 700,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          _selectedImage,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget DetailSection() {
+    TextEditingController _textController = TextEditingController();
+    return Flexible(
+      flex: 2,
+      fit: FlexFit.loose,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 1.3,
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    const TextSpan(
+                                      text: "${productname}\n",
+                                      style: TextStyle(fontSize: 30),
+                                    ),
+                                    WidgetSpan(child: VSpace(10)),
+                                    const TextSpan(
+                                      text: "Brand :${Brandname}",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: blue,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              VSpace(10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              VSpace(10),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemCount: sampleattributes.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final attribute = sampleattributes[index];
+                                  final attributeName =
+                                      attribute['attributeName'] as String;
+                                  final attributes =
+                                      attribute['attributes'] as List<String>;
+
+                                  return Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              attributeName,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          HSpace(10),
+                                          Flexible(
+                                            child: Wrap(
+                                              spacing: 8.0,
+                                              runSpacing: 4.0,
+                                              children: List<Widget>.generate(
+                                                attributes.length,
+                                                (i) {
+                                                  final attr = attributes[i];
+                                                  bool isSelected =
+                                                      _selectedIndices[index] ==
+                                                          i;
+
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _selectedIndices[
+                                                            index] = i;
+                                                      });
+                                                    },
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 4.0,
+                                                          horizontal: 8.00),
+                                                      decoration: BoxDecoration(
+                                                        color: isSelected
+                                                            ? Colors.blue
+                                                            : Colors.grey[200],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        border: Border.all(
+                                                          color: isSelected
+                                                              ? Colors.blue
+                                                              : Colors.grey,
+                                                          width: 1,
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        attr,
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: isSelected
+                                                              ? Colors.white
+                                                              : Colors.black,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      VSpace(10),
+                                    ],
+                                  );
+                                },
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  RichText(
+                                    text: const TextSpan(
+                                      children: [
+                                        WidgetSpan(
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                          child: Icon(Icons.percent),
+                                        ),
+                                        TextSpan(text: "Offers"),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 100,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: 3,
+                                      shrinkWrap: true,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return Wrap(
+                                          children: [
+                                            Container(
+                                              child: const Text("hi"),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              Container(
+                                height: 100,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: 3,
+                                  shrinkWrap: true,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Wrap(
+                                      children: [
+                                        Container(
+                                          child: const Text("hi"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              ListView.builder(
+                                itemCount: sampledescription[0]['description']
+                                        ['applications']
+                                    .length,
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final description = sampledescription[0]
+                                      ['description']['applications'][index];
+
+                                  return RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        const WidgetSpan(
+                                          child: Icon(
+                                            Icons.check,
+                                            color: green,
+                                          ),
+                                        ),
+                                        TextSpan(text: description),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          height: MediaQuery.of(context).size.height,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              VSpace(10),
+                              const Text("Delivery Estimation"),
+                              // Container(
+                              //   height: 30,
+                              //   alignment: Alignment.center,
+                              //   child: Row(
+                              //     mainAxisAlignment: MainAxisAlignment.center,
+                              //     children: [
+                              //       Expanded(
+                              //         child: TextFormField(
+                              //           controller: _textController,
+                              //           keyboardType: TextInputType.number,
+                              //           decoration: InputDecoration(
+                              //             border: OutlineInputBorder(
+                              //               borderRadius:
+                              //                   BorderRadius.circular(0.0),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //       Container(
+                              //         padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                              //         decoration: BoxDecoration(
+                              //           border: Border.all(color: Colors.black),
+                              //         ),
+                              //         child: TextButton(
+                              //           onPressed: () {},
+                              //           child: Text(
+                              //             "Check",
+                              //             style: TextStyle(fontSize: 15),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                              VSpace(10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              VSpace(10),
+                              const Text("Delivery location"),
+                              VSpace(10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              VSpace(10),
+                              const Text("Pincode checker"),
+                              VSpace(10),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: Container(
+                                  height: 30,
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _textController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(0.0),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            5, 5, 5, 5),
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.black),
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {},
+                                          child: const Text(
+                                            "Check",
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              VSpace(10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              VSpace(10),
+                              const Text("Stock Status"),
+                              VSpace(10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              VSpace(10),
+                              const Text("Delivered by & sold by"),
+                              VSpace(10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+                              VSpace(10),
+                              const Text("Product List with quantity"),
+                              VSpace(15),
+                              Container(
+                                height: 180,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: 3,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            HSpace(10),
+                                            Flexible(
+                                              child: Wrap(
+                                                spacing: 8.0,
+                                                runSpacing: 4.0,
+                                                children: [
+                                                  Container(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        RichText(
+                                                          text: TextSpan(
+                                                            children: [
+                                                              TextSpan(
+                                                                  text:
+                                                                      "${index + 1})"),
+                                                              const TextSpan(
+                                                                  text:
+                                                                      "${productname}\n"),
+                                                              const TextSpan(
+                                                                  text:
+                                                                      "SKU number:${sku}\n"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            const Text(
+                                                              "Quantity :",
+                                                              style: TextStyle(
+                                                                  fontSize: 12),
+                                                            ),
+                                                            HSpace(5),
+                                                            Container(
+                                                              decoration: BoxDecoration(
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .black),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              50)),
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  IconButton(
+                                                                    icon: const Icon(
+                                                                        Icons
+                                                                            .remove,
+                                                                        color: Colors
+                                                                            .red,
+                                                                        size:
+                                                                            20),
+                                                                    onPressed:
+                                                                        () {
+                                                                      // Add functionality to decrease quantity
+                                                                    },
+                                                                  ),
+                                                                  Container(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .fromLTRB(
+                                                                            0,
+                                                                            0,
+                                                                            0,
+                                                                            10),
+                                                                    height: 0,
+                                                                    width: 50,
+                                                                    child:
+                                                                        TextField(
+                                                                      controller:
+                                                                          quantity,
+                                                                      keyboardType:
+                                                                          TextInputType
+                                                                              .number,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      decoration:
+                                                                          const InputDecoration(
+                                                                        border:
+                                                                            InputBorder.none,
+                                                                      ),
+                                                                      inputFormatters: <TextInputFormatter>[
+                                                                        FilteringTextInputFormatter
+                                                                            .digitsOnly,
+                                                                      ],
+                                                                      onSubmitted:
+                                                                          (value) {
+                                                                        // Handle submission if needed
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                  IconButton(
+                                                                    icon: const Icon(
+                                                                        Icons
+                                                                            .add,
+                                                                        color: Colors
+                                                                            .red,
+                                                                        size:
+                                                                            20),
+                                                                    onPressed:
+                                                                        () {
+                                                                      // Add functionality to increase quantity
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        VSpace(10),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                              VSpace(10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: div(),
+                              ),
+
+                              VSpace(10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            border:
+                                                Border.all(color: Colors.black),
+                                            borderRadius:
+                                                BorderRadius.circular(50)),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 26, vertical: 10),
+                                        child: const Text(
+                                          "Add to cart",
+                                          style: TextStyle(
+                                              fontSize:
+                                                  15), // Adjust the text style as needed
+                                        ),
+                                      ),
+                                      VSpace(8),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.blue,
+                                            border:
+                                                Border.all(color: Colors.black),
+                                            borderRadius:
+                                                BorderRadius.circular(50)),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 31, vertical: 10),
+                                        child: const Text(
+                                          "Get Quote",
+                                          style: TextStyle(
+                                              fontSize:
+                                                  15), // Adjust the text style as needed
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                              VSpace(10),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
